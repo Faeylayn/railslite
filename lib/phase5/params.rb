@@ -10,9 +10,19 @@ module Phase5
     # You haven't done routing yet; but assume route params will be
     # passed in as a hash to `Params.new` as below:
     def initialize(req, route_params = {})
+        @req = req
+        @params = route_params
+        @req.try(:query_string)
+        merge_set = parse_www_encoded_form(@req.query_string)
+
+        @params.merge!(merge_set)
+        
     end
 
+    
+
     def [](key)
+        @params[key]
     end
 
     def to_s
@@ -28,11 +38,20 @@ module Phase5
     # should return
     # { "user" => { "address" => { "street" => "main", "zip" => "89436" } } }
     def parse_www_encoded_form(www_encoded_form)
+        merge_set = URI::decode_www_form(www_encoded_form)
+        output = JSON.parse(merge_set)
+        parse_key(output.to_s)
     end
 
     # this should return an array
     # user[address][street] should return ['user', 'address', 'street']
     def parse_key(key)
+        output = []
+        ary = key.split(/\]\[|\[|\]/)
+        ary.each do |key|
+            output << key
+        end
+        
     end
   end
 end

@@ -42,9 +42,17 @@ module Phase2
     end
 
     def render(template)
-        f = File.read("views/#{controller_name}/#{template}.html.erb")
-        f.each_line do |line|
+        f = File.readlines("views/#{self.class}/#{template}.html.erb")
+        new_file = File.open("views/#{self.class}/#{template}.html", 'w')
+        f.each do |line|
+            
+            new_line = Erb.new(line.chomp)
+            f.puts new_line.result(binding)
+        end
+        new_file.close
         
+        render_content(new_file, 'html/text')
+            
         
 
     end
